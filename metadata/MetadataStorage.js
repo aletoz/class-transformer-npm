@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var TransformOperationExecutor_1 = require("../TransformOperationExecutor");
 /**
  * Storage all library metadata.
  */
@@ -39,10 +40,10 @@ var MetadataStorage = /** @class */ (function () {
             if (metadata.options.toClassOnly === true && metadata.options.toPlainOnly === true)
                 return true;
             if (metadata.options.toClassOnly === true) {
-                return transformationType === "classToClass" || transformationType === "plainToClass";
+                return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_CLASS || transformationType === TransformOperationExecutor_1.TransformationType.PLAIN_TO_CLASS;
             }
             if (metadata.options.toPlainOnly === true) {
-                return transformationType === "classToPlain";
+                return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_PLAIN;
             }
             return true;
         });
@@ -82,10 +83,10 @@ var MetadataStorage = /** @class */ (function () {
             if (metadata.options.toClassOnly === true && metadata.options.toPlainOnly === true)
                 return true;
             if (metadata.options.toClassOnly === true) {
-                return transformationType === "classToClass" || transformationType === "plainToClass";
+                return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_CLASS || transformationType === TransformOperationExecutor_1.TransformationType.PLAIN_TO_CLASS;
             }
             if (metadata.options.toPlainOnly === true) {
-                return transformationType === "classToPlain";
+                return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_PLAIN;
             }
             return true;
         })
@@ -99,10 +100,10 @@ var MetadataStorage = /** @class */ (function () {
             if (metadata.options.toClassOnly === true && metadata.options.toPlainOnly === true)
                 return true;
             if (metadata.options.toClassOnly === true) {
-                return transformationType === "classToClass" || transformationType === "plainToClass";
+                return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_CLASS || transformationType === TransformOperationExecutor_1.TransformationType.PLAIN_TO_CLASS;
             }
             if (metadata.options.toPlainOnly === true) {
-                return transformationType === "classToPlain";
+                return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_PLAIN;
             }
             return true;
         })

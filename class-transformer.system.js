@@ -94,12 +94,16 @@ System.register("class-transformer/metadata/TransformMetadata", [], function (ex
         }
     };
 });
-System.register("class-transformer/metadata/MetadataStorage", [], function (exports_7, context_7) {
+System.register("class-transformer/metadata/MetadataStorage", ["class-transformer/TransformOperationExecutor"], function (exports_7, context_7) {
     "use strict";
     var __moduleName = context_7 && context_7.id;
-    var MetadataStorage;
+    var TransformOperationExecutor_1, MetadataStorage;
     return {
-        setters: [],
+        setters: [
+            function (TransformOperationExecutor_1_1) {
+                TransformOperationExecutor_1 = TransformOperationExecutor_1_1;
+            }
+        ],
         execute: function () {
             /**
              * Storage all library metadata.
@@ -140,10 +144,10 @@ System.register("class-transformer/metadata/MetadataStorage", [], function (expo
                         if (metadata.options.toClassOnly === true && metadata.options.toPlainOnly === true)
                             return true;
                         if (metadata.options.toClassOnly === true) {
-                            return transformationType === "classToClass" || transformationType === "plainToClass";
+                            return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_CLASS || transformationType === TransformOperationExecutor_1.TransformationType.PLAIN_TO_CLASS;
                         }
                         if (metadata.options.toPlainOnly === true) {
-                            return transformationType === "classToPlain";
+                            return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_PLAIN;
                         }
                         return true;
                     });
@@ -183,10 +187,10 @@ System.register("class-transformer/metadata/MetadataStorage", [], function (expo
                         if (metadata.options.toClassOnly === true && metadata.options.toPlainOnly === true)
                             return true;
                         if (metadata.options.toClassOnly === true) {
-                            return transformationType === "classToClass" || transformationType === "plainToClass";
+                            return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_CLASS || transformationType === TransformOperationExecutor_1.TransformationType.PLAIN_TO_CLASS;
                         }
                         if (metadata.options.toPlainOnly === true) {
-                            return transformationType === "classToPlain";
+                            return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_PLAIN;
                         }
                         return true;
                     })
@@ -200,10 +204,10 @@ System.register("class-transformer/metadata/MetadataStorage", [], function (expo
                         if (metadata.options.toClassOnly === true && metadata.options.toPlainOnly === true)
                             return true;
                         if (metadata.options.toClassOnly === true) {
-                            return transformationType === "classToClass" || transformationType === "plainToClass";
+                            return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_CLASS || transformationType === TransformOperationExecutor_1.TransformationType.PLAIN_TO_CLASS;
                         }
                         if (metadata.options.toPlainOnly === true) {
-                            return transformationType === "classToPlain";
+                            return transformationType === TransformOperationExecutor_1.TransformationType.CLASS_TO_PLAIN;
                         }
                         return true;
                     })
@@ -259,7 +263,7 @@ System.register("class-transformer/storage", ["class-transformer/metadata/Metada
 System.register("class-transformer/TransformOperationExecutor", ["class-transformer/storage"], function (exports_9, context_9) {
     "use strict";
     var __moduleName = context_9 && context_9.id;
-    var storage_1, TransformOperationExecutor;
+    var storage_1, TransformationType, TransformOperationExecutor;
     return {
         setters: [
             function (storage_1_1) {
@@ -267,6 +271,12 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
             }
         ],
         execute: function () {
+            (function (TransformationType) {
+                TransformationType[TransformationType["PLAIN_TO_CLASS"] = 0] = "PLAIN_TO_CLASS";
+                TransformationType[TransformationType["CLASS_TO_PLAIN"] = 1] = "CLASS_TO_PLAIN";
+                TransformationType[TransformationType["CLASS_TO_CLASS"] = 2] = "CLASS_TO_CLASS";
+            })(TransformationType || (TransformationType = {}));
+            exports_9("TransformationType", TransformationType);
             TransformOperationExecutor = /** @class */ (function () {
                 // -------------------------------------------------------------------------
                 // Constructor
@@ -286,7 +296,7 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                     var _this = this;
                     if (level === void 0) { level = 0; }
                     if (value instanceof Array || value instanceof Set) {
-                        var newValue_1 = arrayType && this.transformationType === "plainToClass" ? new arrayType() : [];
+                        var newValue_1 = arrayType && this.transformationType === TransformationType.PLAIN_TO_CLASS ? new arrayType() : [];
                         value.forEach(function (subValue, index) {
                             var subSource = source ? source[index] : undefined;
                             if (!_this.options.enableCircularCheck || !_this.isCircular(subValue, level)) {
@@ -298,7 +308,7 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                                     newValue_1.push(value_1);
                                 }
                             }
-                            else if (_this.transformationType === "classToClass") {
+                            else if (_this.transformationType === TransformationType.CLASS_TO_CLASS) {
                                 if (newValue_1 instanceof Set) {
                                     newValue_1.add(subValue);
                                 }
@@ -326,9 +336,9 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                             return value;
                         return new Date(value);
                     }
-                    else if (value instanceof Object) {
+                    else if (typeof value === "object" && value !== null) {
                         // try to guess the type
-                        if (!targetType && value.constructor !== Object /* && operationType === "classToPlain"*/)
+                        if (!targetType && value.constructor !== Object /* && TransformationType === TransformationType.CLASS_TO_PLAIN*/)
                             targetType = value.constructor;
                         if (!targetType && source)
                             targetType = source.constructor;
@@ -338,7 +348,7 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                         }
                         var keys = this.getKeys(targetType, value);
                         var newValue = source ? source : {};
-                        if (!source && (this.transformationType === "plainToClass" || this.transformationType === "classToClass")) {
+                        if (!source && (this.transformationType === TransformationType.PLAIN_TO_CLASS || this.transformationType === TransformationType.CLASS_TO_CLASS)) {
                             if (isMap) {
                                 newValue = new Map();
                             }
@@ -352,14 +362,14 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                         var _loop_1 = function (key) {
                             var valueKey = key, newValueKey = key, propertyName = key;
                             if (!this_1.options.ignoreDecorators && targetType) {
-                                if (this_1.transformationType === "plainToClass") {
+                                if (this_1.transformationType === TransformationType.PLAIN_TO_CLASS) {
                                     var exposeMetadata = storage_1.defaultMetadataStorage.findExposeMetadataByCustomName(targetType, key);
                                     if (exposeMetadata) {
                                         propertyName = exposeMetadata.propertyName;
                                         newValueKey = exposeMetadata.propertyName;
                                     }
                                 }
-                                else if (this_1.transformationType === "classToPlain" || this_1.transformationType === "classToClass") {
+                                else if (this_1.transformationType === TransformationType.CLASS_TO_PLAIN || this_1.transformationType === TransformationType.CLASS_TO_CLASS) {
                                     var exposeMetadata = storage_1.defaultMetadataStorage.findExposeMetadata(targetType, key);
                                     if (exposeMetadata && exposeMetadata.options && exposeMetadata.options.name)
                                         newValueKey = exposeMetadata.options.name;
@@ -396,23 +406,23 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                             }
                             // if value is an array try to get its custom array type
                             var arrayType_1 = value[valueKey] instanceof Array ? this_1.getReflectedType(targetType, propertyName) : undefined;
-                            // const subValueKey = operationType === "plainToClass" && newKeyName ? newKeyName : key;
+                            // const subValueKey = TransformationType === TransformationType.PLAIN_TO_CLASS && newKeyName ? newKeyName : key;
                             var subSource = source ? source[valueKey] : undefined;
                             // if its deserialization then type if required
                             // if we uncomment this types like string[] will not work
-                            // if (this.transformationType === "plainToClass" && !type && subValue instanceof Object && !(subValue instanceof Date))
+                            // if (this.transformationType === TransformationType.PLAIN_TO_CLASS && !type && subValue instanceof Object && !(subValue instanceof Date))
                             //     throw new Error(`Cannot determine type for ${(targetType as any).name }.${propertyName}, did you forget to specify a @Type?`);
                             // if newValue is a source object that has method that match newKeyName then skip it
                             if (newValue.constructor.prototype) {
                                 var descriptor = Object.getOwnPropertyDescriptor(newValue.constructor.prototype, newValueKey);
-                                if ((this_1.transformationType === "plainToClass" || this_1.transformationType === "classToClass")
+                                if ((this_1.transformationType === TransformationType.PLAIN_TO_CLASS || this_1.transformationType === TransformationType.CLASS_TO_CLASS)
                                     && (newValue[newValueKey] instanceof Function || (descriptor && !descriptor.set)))
                                     return "continue";
                             }
                             if (!this_1.options.enableCircularCheck || !this_1.isCircular(subValue, level)) {
-                                var transformKey = this_1.transformationType === "plainToClass" ? newValueKey : key;
+                                var transformKey = this_1.transformationType === TransformationType.PLAIN_TO_CLASS ? newValueKey : key;
                                 var finalValue = this_1.transform(subSource, subValue, type, arrayType_1, isSubValueMap, level + 1);
-                                finalValue = this_1.applyCustomTransformations(finalValue, targetType, transformKey);
+                                finalValue = this_1.applyCustomTransformations(finalValue, targetType, transformKey, value, this_1.transformationType);
                                 if (newValue instanceof Map) {
                                     newValue.set(newValueKey, finalValue);
                                 }
@@ -420,9 +430,9 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                                     newValue[newValueKey] = finalValue;
                                 }
                             }
-                            else if (this_1.transformationType === "classToClass") {
+                            else if (this_1.transformationType === TransformationType.CLASS_TO_CLASS) {
                                 var finalValue = subValue;
-                                finalValue = this_1.applyCustomTransformations(finalValue, targetType, key);
+                                finalValue = this_1.applyCustomTransformations(finalValue, targetType, key, value, this_1.transformationType);
                                 if (newValue instanceof Map) {
                                     newValue.set(newValueKey, finalValue);
                                 }
@@ -443,7 +453,7 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                         return value;
                     }
                 };
-                TransformOperationExecutor.prototype.applyCustomTransformations = function (value, target, key) {
+                TransformOperationExecutor.prototype.applyCustomTransformations = function (value, target, key, obj, transformationType) {
                     var _this = this;
                     var metadatas = storage_1.defaultMetadataStorage.findTransformMetadatas(target, key, this.transformationType);
                     // apply versioning options
@@ -464,13 +474,11 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                     }
                     else {
                         metadatas = metadatas.filter(function (metadata) {
-                            return !metadata.options ||
-                                !metadata.options.groups ||
-                                !metadata.options.groups.length;
+                            return !metadata.options || !metadata.options.groups || !metadata.options.groups.length;
                         });
                     }
                     metadatas.forEach(function (metadata) {
-                        value = metadata.transformFn(value);
+                        value = metadata.transformFn(value, obj, transformationType);
                     });
                     return value;
                 };
@@ -504,7 +512,7 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                     if (!this.options.ignoreDecorators && target) {
                         // add all exposed to list of keys
                         var exposedProperties = storage_1.defaultMetadataStorage.getExposedProperties(target, this.transformationType);
-                        if (this.transformationType === "plainToClass") {
+                        if (this.transformationType === TransformationType.PLAIN_TO_CLASS) {
                             exposedProperties = exposedProperties.map(function (key) {
                                 var exposeMetadata = storage_1.defaultMetadataStorage.findExposeMetadata(target, key);
                                 if (exposeMetadata && exposeMetadata.options && exposeMetadata.options.name) {
@@ -542,10 +550,7 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
                         else {
                             keys = keys.filter(function (key) {
                                 var exposeMetadata = storage_1.defaultMetadataStorage.findExposeMetadata(target, key);
-                                return !exposeMetadata ||
-                                    !exposeMetadata.options ||
-                                    !exposeMetadata.options.groups ||
-                                    !exposeMetadata.options.groups.length;
+                                return !exposeMetadata || !exposeMetadata.options || !exposeMetadata.options.groups || !exposeMetadata.options.groups.length;
                             });
                         }
                     }
@@ -583,11 +588,11 @@ System.register("class-transformer/TransformOperationExecutor", ["class-transfor
 System.register("class-transformer/ClassTransformer", ["class-transformer/TransformOperationExecutor"], function (exports_10, context_10) {
     "use strict";
     var __moduleName = context_10 && context_10.id;
-    var TransformOperationExecutor_1, ClassTransformer;
+    var TransformOperationExecutor_2, ClassTransformer;
     return {
         setters: [
-            function (TransformOperationExecutor_1_1) {
-                TransformOperationExecutor_1 = TransformOperationExecutor_1_1;
+            function (TransformOperationExecutor_2_1) {
+                TransformOperationExecutor_2 = TransformOperationExecutor_2_1;
             }
         ],
         execute: function () {
@@ -595,27 +600,27 @@ System.register("class-transformer/ClassTransformer", ["class-transformer/Transf
                 function ClassTransformer() {
                 }
                 ClassTransformer.prototype.classToPlain = function (object, options) {
-                    var executor = new TransformOperationExecutor_1.TransformOperationExecutor("classToPlain", options || {});
+                    var executor = new TransformOperationExecutor_2.TransformOperationExecutor(TransformOperationExecutor_2.TransformationType.CLASS_TO_PLAIN, options || {});
                     return executor.transform(undefined, object, undefined, undefined, undefined, undefined);
                 };
                 ClassTransformer.prototype.classToPlainFromExist = function (object, plainObject, options) {
-                    var executor = new TransformOperationExecutor_1.TransformOperationExecutor("classToPlain", options || {});
+                    var executor = new TransformOperationExecutor_2.TransformOperationExecutor(TransformOperationExecutor_2.TransformationType.CLASS_TO_PLAIN, options || {});
                     return executor.transform(plainObject, object, undefined, undefined, undefined, undefined);
                 };
                 ClassTransformer.prototype.plainToClass = function (cls, plain, options) {
-                    var executor = new TransformOperationExecutor_1.TransformOperationExecutor("plainToClass", options || {});
+                    var executor = new TransformOperationExecutor_2.TransformOperationExecutor(TransformOperationExecutor_2.TransformationType.PLAIN_TO_CLASS, options || {});
                     return executor.transform(undefined, plain, cls, undefined, undefined, undefined);
                 };
                 ClassTransformer.prototype.plainToClassFromExist = function (clsObject, plain, options) {
-                    var executor = new TransformOperationExecutor_1.TransformOperationExecutor("plainToClass", options || {});
+                    var executor = new TransformOperationExecutor_2.TransformOperationExecutor(TransformOperationExecutor_2.TransformationType.PLAIN_TO_CLASS, options || {});
                     return executor.transform(clsObject, plain, undefined, undefined, undefined, undefined);
                 };
                 ClassTransformer.prototype.classToClass = function (object, options) {
-                    var executor = new TransformOperationExecutor_1.TransformOperationExecutor("classToClass", options || {});
+                    var executor = new TransformOperationExecutor_2.TransformOperationExecutor(TransformOperationExecutor_2.TransformationType.CLASS_TO_CLASS, options || {});
                     return executor.transform(undefined, object, undefined, undefined, undefined, undefined);
                 };
                 ClassTransformer.prototype.classToClassFromExist = function (object, fromObject, options) {
-                    var executor = new TransformOperationExecutor_1.TransformOperationExecutor("classToClass", options || {});
+                    var executor = new TransformOperationExecutor_2.TransformOperationExecutor(TransformOperationExecutor_2.TransformationType.CLASS_TO_CLASS, options || {});
                     return executor.transform(fromObject, object, undefined, undefined, undefined, undefined);
                 };
                 ClassTransformer.prototype.serialize = function (object, options) {
@@ -798,7 +803,7 @@ System.register("class-transformer/index", ["class-transformer/ClassTransformer"
         return classTransformer.deserializeArray(cls, json, options);
     }
     exports_12("deserializeArray", deserializeArray);
-    var ClassTransformer_2, classTransformer;
+    var ClassTransformer_2, classTransformer, TransformationType;
     var exportedNames_1 = {
         "classToPlain": true,
         "classToPlainFromExist": true,
@@ -809,6 +814,7 @@ System.register("class-transformer/index", ["class-transformer/ClassTransformer"
         "serialize": true,
         "deserialize": true,
         "deserializeArray": true,
+        "TransformationType": true,
         "ClassTransformer": true
     };
     function exportStar_1(m) {
@@ -832,6 +838,15 @@ System.register("class-transformer/index", ["class-transformer/ClassTransformer"
         ],
         execute: function () {
             classTransformer = new ClassTransformer_2.ClassTransformer();
+            /**
+             * Enum representing the different transformation types.
+             */
+            (function (TransformationType) {
+                TransformationType[TransformationType["PLAIN_TO_CLASS"] = 0] = "PLAIN_TO_CLASS";
+                TransformationType[TransformationType["CLASS_TO_PLAIN"] = 1] = "CLASS_TO_PLAIN";
+                TransformationType[TransformationType["CLASS_TO_CLASS"] = 2] = "CLASS_TO_CLASS";
+            })(TransformationType || (TransformationType = {}));
+            exports_12("TransformationType", TransformationType);
         }
     };
 });

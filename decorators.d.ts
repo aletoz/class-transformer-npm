@@ -1,9 +1,10 @@
 import { ExposeOptions, ExcludeOptions, TypeOptions, TransformOptions } from "./metadata/ExposeExcludeOptions";
 import { ClassTransformOptions } from "./ClassTransformOptions";
+import { TransformationType } from "./TransformOperationExecutor";
 /**
  * Defines a custom logic for value transformation.
  */
-export declare function Transform(transformFn: (value: any) => any, options?: TransformOptions): (target: any, key: string) => void;
+export declare function Transform(transformFn: (value: any, obj: any, transformationType: TransformationType) => any, options?: TransformOptions): (target: any, key: string) => void;
 /**
  * Specifies a type of the property.
  */

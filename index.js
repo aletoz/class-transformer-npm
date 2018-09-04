@@ -50,5 +50,14 @@ function deserializeArray(cls, json, options) {
     return classTransformer.deserializeArray(cls, json, options);
 }
 exports.deserializeArray = deserializeArray;
+/**
+ * Enum representing the different transformation types.
+ */
+var TransformationType;
+(function (TransformationType) {
+    TransformationType[TransformationType["PLAIN_TO_CLASS"] = 0] = "PLAIN_TO_CLASS";
+    TransformationType[TransformationType["CLASS_TO_PLAIN"] = 1] = "CLASS_TO_PLAIN";
+    TransformationType[TransformationType["CLASS_TO_CLASS"] = 2] = "CLASS_TO_CLASS";
+})(TransformationType = exports.TransformationType || (exports.TransformationType = {}));
 
 //# sourceMappingURL=index.js.map

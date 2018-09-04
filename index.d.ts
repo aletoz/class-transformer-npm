@@ -53,3 +53,11 @@ export declare function deserialize<T>(cls: ClassType<T>, json: string, options?
  * Deserializes given JSON string to an array of objects of the given class.
  */
 export declare function deserializeArray<T>(cls: ClassType<T>, json: string, options?: ClassTransformOptions): T[];
+/**
+ * Enum representing the different transformation types.
+ */
+export declare enum TransformationType {
+    PLAIN_TO_CLASS = 0,
+    CLASS_TO_PLAIN = 1,
+    CLASS_TO_CLASS = 2,
+}
